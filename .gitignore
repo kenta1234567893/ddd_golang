@@ -25,3 +25,5 @@ go.work.sum
 .env
 
 docker/db/mysql_data
+
+**/__debug_bin*
