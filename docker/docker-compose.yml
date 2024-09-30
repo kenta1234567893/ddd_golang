@@ -16,7 +16,7 @@ services:
       MYSQL_ROOT_PASSWORD: password
       MYSQL_USER: localuser
       MYSQL_PASSWORD: localpass
-      MYSQL_DATABASE: common
+      MYSQL_DATABASE: company
       TZ: "Asia/Tokyo"
     volumes:
       - ./db/my.cnf:/etc/mysql/conf.d/my.cnf

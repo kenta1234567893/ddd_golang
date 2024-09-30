@@ -1,5 +1,9 @@
 .PHONY: up
 
+.PHONY: migrate
+migrate: ## DBマイグレーション
+	@go run src/cmd/migration/migrate.go 
+
 up: ## Docker 起動
 	docker compose up -d
 
