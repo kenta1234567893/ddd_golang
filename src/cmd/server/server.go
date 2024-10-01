@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/gorilla/sessions"
+	"github.com/kenta1234567893/upsider-coding-test/src/cmd/server/libs"
 	"github.com/kenta1234567893/upsider-coding-test/src/cmd/server/mymiddleware"
 	"github.com/kenta1234567893/upsider-coding-test/src/cmd/server/router"
 	"github.com/labstack/echo-contrib/session"
@@ -12,6 +13,12 @@ import (
 )
 
 func main() {
+	e := setupServer()
+
+	e.Logger.Fatal(e.Start(":1323"))
+}
+
+func setupServer() *echo.Echo {
 	e := echo.New()
 
 	// ミドルウェア
@@ -27,9 +34,13 @@ func main() {
 		return c.String(http.StatusOK, "OK")
 	})
 
+	client := libs.GetClient()
+
+	controllers := libs.InitializeController(client)
+
 	// ルーティング
 	router.AuthRouter(e)
-	router.ApiRouter(e)
+	router.ApiRouter(e, controllers)
 
-	e.Logger.Fatal(e.Start(":1323"))
+	return e
 }
