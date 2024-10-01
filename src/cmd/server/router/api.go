@@ -12,5 +12,6 @@ func ApiRouter(e *echo.Echo, controllers *libs.InitializeControllers) {
 	authed.Use(mymiddleware.CheckSession)
 
 	authed.POST("/api/invoices", controllers.InvoiceController.Issue)
+	authed.GET("/api/invoices", controllers.InvoiceController.Search)
 
 }

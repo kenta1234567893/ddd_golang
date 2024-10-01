@@ -9,8 +9,13 @@ package libs
 import (
 	"github.com/kenta1234567893/upsider-coding-test/ent"
 	"github.com/kenta1234567893/upsider-coding-test/src/controller"
+	"github.com/kenta1234567893/upsider-coding-test/src/infra/queryservice"
 	"github.com/kenta1234567893/upsider-coding-test/src/infra/repository"
 	"github.com/kenta1234567893/upsider-coding-test/src/usecase/invoice"
+)
+
+import (
+	_ "github.com/go-sql-driver/mysql"
 )
 
 // Injectors from wire.go:
@@ -18,7 +23,8 @@ import (
 func InitializeController(client *ent.Client) *InitializeControllers {
 	invoiceRepository := repository.NewInvoiceRepository(client)
 	createInvoiceUsecase := invoice.NewCreateInvoiceUsecase(invoiceRepository)
-	invoiceController := controller.NewInvoiceController(createInvoiceUsecase)
+	invoiceQueryService := queryservice.NewInvoiceQueryService(client)
+	invoiceController := controller.NewInvoiceController(createInvoiceUsecase, invoiceQueryService)
 	initializeControllers := &InitializeControllers{
 		InvoiceController: invoiceController,
 	}

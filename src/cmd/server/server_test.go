@@ -3,9 +3,11 @@ package main
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"io"
 	"net/http"
 	"net/http/httptest"
+	"net/url"
 	"testing"
 	"time"
 
@@ -140,4 +142,64 @@ func TestIssueInvoice(t *testing.T) {
 		t.Errorf("Expected Status, got %s", responseData.Status)
 
 	}
+}
+
+func TestSearchInvoice(t *testing.T) {
+
+	e := httptest.NewServer(setupServer())
+	defer e.Close()
+
+	c := &http.Client{}
+
+	// ログイン処理
+	loginRequest, err := http.NewRequest("POST", e.URL+"/login", nil)
+	if err != nil {
+		t.Errorf("Error making request: %s", err)
+		return
+	}
+	loginResponse, err := c.Do(loginRequest)
+	if err != nil {
+		t.Errorf("Error making request: %s", err)
+		return
+	}
+	defer loginResponse.Body.Close()
+
+	u, err := url.Parse(e.URL + "/api/invoices")
+	if err != nil {
+		t.Errorf("Error making request: %s", err)
+		return
+	}
+	// クエリパラメータ
+	q := u.Query()
+	q.Set("company_id", "1")
+	q.Set("payment_due_date_start", "2024-10-16T00:00:00Z")
+	q.Set("payment_due_date_end", "2024-11-16T00:00:00Z")
+	u.RawQuery = q.Encode()
+
+	request, err := http.NewRequest("GET", u.String(), nil)
+	if err != nil {
+		t.Errorf("Error making request: %s", err)
+		return
+	}
+
+	request.Header.Add("Content-Type", "application/json")
+	request.Header.Add("Cookie", loginResponse.Header.Get("Set-Cookie"))
+
+	r, err := c.Do(request)
+	if err != nil {
+		t.Errorf("Error making request: %s", err)
+		return
+	}
+	defer r.Body.Close()
+	if r.StatusCode != 200 {
+		t.Errorf("Expected 200, got %d", r.StatusCode)
+	}
+
+	body, err := io.ReadAll(r.Body)
+	if err != nil {
+		t.Errorf("Error reading response body: %s", err)
+		return
+	}
+
+	fmt.Println(string(body))
 }
